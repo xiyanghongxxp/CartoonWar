@@ -3,6 +3,7 @@ package com.neusoft.planewar.entity;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.List;
+import java.util.Random;
 
 import com.neusoft.planewar.client.PlaneWarSystem;
 import com.neusoft.planewar.constant.Constant;
@@ -24,7 +25,7 @@ public class Bullet extends PlaneWarObject{
     private boolean good;
     
     
-    
+    static Random r = new Random();
     
     public boolean isGood() {
         return good;
@@ -112,7 +113,7 @@ public class Bullet extends PlaneWarObject{
         if(live&&plane.isLive()&&this.getReck().intersects(plane.getReck())&&this.good!=plane.isGood()) {
             //System.out.println("打到了");
             if(plane.isGood()) {
-                plane.setBlood(plane.getBlood()-20);
+                plane.setBlood(plane.getBlood()-10);
                 this.live = false;
                 if(plane.getBlood()<=0) {
                     plane.setLive(false);
@@ -127,6 +128,13 @@ public class Bullet extends PlaneWarObject{
                 this.pws.explodes.add(e);
                 this.live=false;
                 plane.setLive(false);
+                //生成血块
+                if(r.nextInt(100)>90) {
+                    Item item = new Item(pws, plane.x, plane.y);
+                    pws.items.add(item);
+                }
+                
+                
                 return true;
             }
             

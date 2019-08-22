@@ -2,7 +2,9 @@ package com.neusoft.planewar.entity;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.List;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.neusoft.planewar.client.PlaneWarSystem;
@@ -22,7 +24,6 @@ import com.neusoft.planewar.util.GameUtil;
 public class Plane extends PlaneWarObject {
     
     private int speed;
-    
     private boolean left,up,right,down;
     
     public Direction dir;
@@ -99,7 +100,7 @@ public class Plane extends PlaneWarObject {
     @Override
     public void draw(Graphics g) {
         if(!live) {
-            this.pws.enemPlanes.remove(this);
+            this.pws.enemyPlanes.remove(this);
         }
         if(good) {
             bloodBar.draw(g);
@@ -146,7 +147,7 @@ public class Plane extends PlaneWarObject {
         }
         outOfBounds();
         if(!good) {
-            if(r.nextInt(100)>97) {
+            if(r.nextInt(100)>90) {
                 fire();
             }
         }
@@ -233,7 +234,7 @@ public class Plane extends PlaneWarObject {
         confirmDirection();
     }
     
-    private void fire() {
+    privete void fire() {
         if(good) {
             Bullet bullet = new Bullet (this.x+this.img.getWidth(null)/2-34,this.y-110,"mybullet_up",Direction.UP,pws,good);
             pws.bullets.add(bullet);}
@@ -256,6 +257,8 @@ public class Plane extends PlaneWarObject {
         }
         if(y > Constant.GAME_HEIGHT - this.img.getHeight(null) && this.good) {
             y = Constant.GAME_HEIGHT - this.img.getHeight(null);
+        }else if(y>Constant.GAME_HEIGHT + this.img.getHeight(null) &&!this.good) {
+            pws.enemyPlanes.remove(this);
         }   
         
     }
@@ -279,5 +282,26 @@ public class Plane extends PlaneWarObject {
             
         }
     }
+    //³Ôyige µÀ¾ß¼ÓÑª
+    private boolean eatItem(Item i) {
+        if(this.good&&this.live&&i.isLive()&&this.getReck().intersects(i.getReck())&&this.blood<100) {
+            this.blood +=10;
+            
+            i.setLive(false);
+            return true;
+        }
+        return false;
+    }
+    //
+    public boolean eatItem(ArrayList<Item> items) {
+        for(int i= 0;i<items.size();i++) {
+            Item item = items.get(i);
+            if(this.eatItem(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
 
 }

@@ -15,5 +15,6 @@ public class Constant {
     public static final String IMG_PRE = "com/neusoft/planewar/img/";
     public static final String IMG_AFTER = ".png";
     public static final int ENEMY_PLANE_NUM = 3;
+    public static int BOSS_A_BLOOD = 1000;
 
 }

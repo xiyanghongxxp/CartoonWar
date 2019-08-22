@@ -9,8 +9,10 @@ import com.neusoft.planewar.constant.Constant;
 import com.neusoft.planewar.core.Direction;
 import com.neusoft.planewar.core.MyFrame;
 import com.neusoft.planewar.entity.Background;
+import com.neusoft.planewar.entity.Boss;
 import com.neusoft.planewar.entity.Bullet;
 import com.neusoft.planewar.entity.Explode;
+import com.neusoft.planewar.entity.Item;
 import com.neusoft.planewar.entity.Plane;
 
 /**
@@ -30,15 +32,18 @@ public class PlaneWarSystem extends MyFrame{
     //创建飞机
     public Plane myPlane = new Plane (210,745,true,this);
     //创建敌方飞机的容器
-    public ArrayList<Plane>enemPlanes = new ArrayList<>();
+    public ArrayList<Plane>enemyPlanes = new ArrayList<>();
     //创建子弹的容器
     public ArrayList<Bullet>bullets = new ArrayList<>();
     //爆炸容器
     public ArrayList<Explode> explodes = new ArrayList<>();
-    //测试爆炸
-    //Explode explode = new Explode(200,500);
-    //画出一枚子弹
-    //Bullet bullet = new Bullet(100,745,Direction.UP);
+    //道具
+    //public Item i = new Item(this);
+    
+    //
+    Boss boss = new Boss(this);
+    
+    public ArrayList<Item>items = new ArrayList<Item>();
     @Override
         public void launchFrame() {
             
@@ -58,13 +63,11 @@ public class PlaneWarSystem extends MyFrame{
             });
             for(int i = 0;i<Constant.ENEMY_PLANE_NUM;i++) {
                 Plane enemyPlane = new Plane (90+i*120,-200,false,this);
-                Plane enemyPlane1 = new Plane (90+i*120,-1000,false,this);
-                Plane enemyPlane2 = new Plane (90+i*120,-1800,false,this);
-                enemPlanes.add(enemyPlane);
-                enemPlanes.add(enemyPlane1);
-                enemPlanes.add(enemyPlane2);
+                enemyPlanes.add(enemyPlane);
             }
-            enemPlanes.add(myPlane);
+            enemyPlanes.add(myPlane);
+            Item o = new Item(this);
+            items.add(o);
         }
 
     /**
@@ -76,14 +79,14 @@ public class PlaneWarSystem extends MyFrame{
     public void paint(Graphics g) {
         
         background.draw(g);
-        for(int i = 0;i<enemPlanes.size();i++) {
-            Plane plane = enemPlanes.get(i);
+        for(int i = 0;i<enemyPlanes.size();i++) {
+            Plane plane = enemyPlanes.get(i);
             plane.draw(g);
         }  
         for(int i = 0;i<bullets.size();i++) {
             Bullet bullet = bullets.get(i);
             bullet.draw(g);
-            bullet.hitPlane(enemPlanes);
+            bullet.hitPlane(enemyPlanes);
             bullet.hitPlane(myPlane);
         }
         for(int i = 0;i<explodes.size();i++) {
@@ -91,11 +94,35 @@ public class PlaneWarSystem extends MyFrame{
             e.draw(g);
             
         }
+        //for(int i =0;i<items.size();i++) {
+         //   Item item = items.get(i);
+         //   myPlane.eatItem(items);
+         //   if(myPlane.isLive()&&myPlane.getBlood()<=40) {
+        //        item.draw(g);
+         //   }
+            
+        //}
+        if(items.size()>0) {
+            for(int i =0;i<items.size();i++) {
+                Item item = items.get(i);
+                item.draw(g);
+            }
+        }
+        if(enemyPlanes.size()<=1&&myPlane.isLive()) {
+            for(int i = 0;i<Constant.ENEMY_PLANE_NUM;i++) {
+                Plane enemyPlane = new Plane (90+i*120,-200,false,this);
+                enemyPlanes.add(enemyPlane);
+            }
+        }
+        myPlane.eatItem(items);
+        boss.draw(g);
         g.drawString("子弹的数量："+bullets.size(), 50, 40);
-        g.drawString("敌人的数量："+enemPlanes.size(), 50, 80);
+        g.drawString("敌人的数量："+enemyPlanes.size(), 50, 80);
         g.drawString("爆炸的数量："+explodes.size(), 50, 120);
         g.drawString("我方飞机血量："+myPlane.getBlood(), 50, 160);
-            
+        g.drawString("道具容器大小："+items.size(), 50, 200);
+        g.drawString("Boss存活状态："+boss.isLive(), 50, 220);
+
     }
     
     
