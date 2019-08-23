@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.neusoft.planewar.client.PlaneWarSystem;
 import com.neusoft.planewar.constant.Constant;
+import com.neusoft.planewar.core.Direction;
 import com.neusoft.planewar.core.Images;
 import com.neusoft.planewar.core.PlaneWarObject;
 
@@ -23,6 +24,7 @@ public class Item extends PlaneWarObject{
 
 
     private boolean live;
+    private int type;
 
     private int speed;
 
@@ -44,18 +46,26 @@ public class Item extends PlaneWarObject{
 
     public Item() {}
     
-    public Item(PlaneWarSystem pws) {
+    public Item(PlaneWarSystem pws,String imgpath) {
         this.pws = pws;
-        this.img = Images.imgs.get("addBlood");
+        this.img = Images.imgs.get(imgpath);
         this.x = r.nextInt(Constant.GAME_WIDTH-2*img.getWidth(null))+img.getWidth(null);
         this.y = r.nextInt(Constant.GAME_HEIGHT-2*img.getHeight(null)+30)+img.getHeight(null);
         this.speed = 10;
         this.live=true;
         this.degree = r.nextInt((int)(Math.PI*2));
+        
     }
-    public Item(PlaneWarSystem pws, int x ,int y) {
+    public Item(PlaneWarSystem pws, int x ,int y,int type) {
         this.pws = pws;
-        this.img=Images.imgs.get("addBlood");
+        this.type = type;
+        if(type==1) {
+            
+            this.img=Images.imgs.get("addBlood");
+        }else {
+            this.img=Images.imgs.get("BulletLevelUp");
+        }
+        
         this.x = x;
         this.y = y;
         this.speed = 10;

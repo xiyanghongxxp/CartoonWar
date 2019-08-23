@@ -32,8 +32,15 @@ public class Plane extends PlaneWarObject {
     PlaneWarSystem pws;
     
     private int blood=100;
+    private int level;
     
     
+    public int getLevel() {
+        return level;
+    }
+    public void setLevel(int level) {
+        this.level = level;
+    }
     public int getBlood() {
         return blood;
     }
@@ -68,20 +75,21 @@ public class Plane extends PlaneWarObject {
         this.speed=speed;
         this.dir= dir;
     }
-    public Plane(int x,int y,boolean good ,PlaneWarSystem pws) {
+    public Plane(int x,int y,boolean good ,String imgPath,PlaneWarSystem pws) {
         this.x = x;
         this.y = y;
         this.good = good;
         if(good) {
-            this.img = Images.imgs.get("me");
+            this.img = Images.imgs.get(imgPath);
             this.dir = Direction.STOP;
-            this.speed = 20;
+            this.speed = 25;
             this.blood=blood;
+            this.level=1;
             
         }else {
-            this.img = Images.imgs.get("enemy");
+            this.img = Images.imgs.get(imgPath);
             this.dir = Direction.DOWN;
-            this.speed = 5;
+            this.speed = 15;
         }
         this.pws = pws;
         this.live = true;
@@ -147,7 +155,7 @@ public class Plane extends PlaneWarObject {
         }
         outOfBounds();
         if(!good) {
-            if(r.nextInt(100)>90) {
+            if(r.nextInt(100)>97) {
                 fire();
             }
         }
@@ -233,16 +241,46 @@ public class Plane extends PlaneWarObject {
         }
         confirmDirection();
     }
-    
-    privete void fire() {
+    //开火：我方等级为1,2,3级
+    private void fire() {
         if(good) {
-            Bullet bullet = new Bullet (this.x+this.img.getWidth(null)/2-34,this.y-110,"mybullet_up",Direction.UP,pws,good);
-            pws.bullets.add(bullet);}
-        else{
-            Bullet bullet = new Bullet (this.x+this.img.getWidth(null)/2-7,this.y+70,"enemybullet_down",Direction.DOWN,pws,good);
-            pws.bullets.add(bullet);
+            //1级时发射
+            if(this.level ==1) {
+                Bullet bullet = new Bullet (this.x+this.img.getWidth(null)/2-34,this.y-110,"mybullet_up",Direction.UP,pws,good,false);
+                pws.bullets.add(bullet);
+            }
+            //二级时发射
+            else if(this.level == 2) {
+                Bullet bullet1 = new Bullet (this.x-15,this.y-30,"bullet0",Direction.UP,pws,good,false);
+                Bullet bullet2 = new Bullet (this.x+this.img.getWidth(null)/2-40,this.y-161,"myBulletLevel2",Direction.UP,pws,good,false);
+                Bullet bullet3 = new Bullet (this.x+this.img.getWidth(null)-15,this.y-30,"bullet0",Direction.UP,pws,good,false);
+                pws.bullets.add(bullet1);
+                pws.bullets.add(bullet2);
+                pws.bullets.add(bullet3);
+                //3级时发射
+            }else if(this.level == 3) {
+                Bullet bullet1 = new Bullet (this.x-15,this.y-30,"bullet0",Direction.UP,pws,good,false);
+                Bullet bullet2 = new Bullet (this.x-15,this.y-60,"bullet0",Direction.UP,pws,good,false);
+                Bullet bullet3 = new Bullet (this.x-15,this.y-90,"bullet0",Direction.UP,pws,good,false);
+                Bullet bullet4 = new Bullet (this.x+this.img.getWidth(null)/2-40,this.y-161,"myBulletLevel2",Direction.UP,pws,good,false);
+                Bullet bullet5 = new Bullet (this.x+this.img.getWidth(null)-15,this.y-30,"bullet0",Direction.UP,pws,good,false);
+                Bullet bullet6 = new Bullet (this.x+this.img.getWidth(null)-15,this.y-60,"bullet0",Direction.UP,pws,good,false);
+                Bullet bullet7 = new Bullet (this.x+this.img.getWidth(null)-15,this.y-90,"bullet0",Direction.UP,pws,good,false);
+                pws.bullets.add(bullet1);
+                pws.bullets.add(bullet2);
+                pws.bullets.add(bullet3);
+                pws.bullets.add(bullet4);
+                pws.bullets.add(bullet5);
+                pws.bullets.add(bullet6);
+                pws.bullets.add(bullet7);
+                
+            }
+            //敌方小飞机发射
+        }else{
+                Bullet bullet = new Bullet (this.x+this.img.getWidth(null)/2-7,this.y+70,"enemybullet_down",Direction.DOWN,pws,good,false);
+                pws.bullets.add(bullet);            
         }
-        //System.out.println("添加成功");
+        
     }
     //我方飞机出界问题
     private void outOfBounds() {
@@ -283,7 +321,7 @@ public class Plane extends PlaneWarObject {
         }
     }
     //吃yige 道具加血
-    private boolean eatItem(Item i) {
+    private boolean eatItemAddHp(Item i) {
         if(this.good&&this.live&&i.isLive()&&this.getReck().intersects(i.getReck())&&this.blood<100) {
             this.blood +=10;
             
@@ -293,10 +331,33 @@ public class Plane extends PlaneWarObject {
         return false;
     }
     //
-    public boolean eatItem(ArrayList<Item> items) {
+    public boolean eatItemAddHp(ArrayList<Item> items) {
         for(int i= 0;i<items.size();i++) {
             Item item = items.get(i);
-            if(this.eatItem(item)) {
+            if(this.eatItemAddHp(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    
+    
+  //吃yige 道具升级
+    private boolean eatItemLevelUp(Item i) {
+        if(this.good&&this.live&&i.isLive()&&this.getReck().intersects(i.getReck())&&this.level<3) {
+            this.level +=1;            
+            i.setLive(false);
+            return true;
+        }
+        return false;
+    }
+    //
+    public boolean eatItemLevelUp(ArrayList<Item> items) {
+        for(int i= 0;i<items.size();i++) {
+            Item item = items.get(i);
+            if(this.eatItemLevelUp(item)) {
                 return true;
             }
         }

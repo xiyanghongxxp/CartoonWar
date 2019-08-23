@@ -2,7 +2,9 @@ package com.neusoft.planewar.util;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
@@ -14,6 +16,19 @@ import javax.imageio.ImageIO;
 *
 */
 public class GameUtil {
+    public static Properties prop = new Properties();
+    static {
+        try {
+            prop.load(GameUtil.class.getClassLoader().getResourceAsStream("planewar.properties"));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
+    
+    
+    
 
     //获取图片的方法
     public static Image getImage(String imgpath) {

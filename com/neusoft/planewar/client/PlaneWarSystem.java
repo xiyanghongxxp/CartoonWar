@@ -27,10 +27,10 @@ public class PlaneWarSystem extends MyFrame{
      * 
      */
     //背景
-    Background background = new Background(0,-27000,"bj");
+    Background background = new Background();
     
     //创建飞机
-    public Plane myPlane = new Plane (210,745,true,this);
+    public Plane myPlane = new Plane (210,745,true,"me",this);
     //创建敌方飞机的容器
     public ArrayList<Plane>enemyPlanes = new ArrayList<>();
     //创建子弹的容器
@@ -62,12 +62,16 @@ public class PlaneWarSystem extends MyFrame{
                 }
             });
             for(int i = 0;i<Constant.ENEMY_PLANE_NUM;i++) {
-                Plane enemyPlane = new Plane (90+i*120,-200,false,this);
+                Plane enemyPlane = new Plane (90+i*120,-600,false,"enemy",this);
+                enemyPlanes.add(enemyPlane);
+            }
+            for(int i = 0;i<Constant.ENEMY_PLANE_NUM;i++) {
+                Plane enemyPlane = new Plane (90+i*120,-150,false,"enemyPlane2",this);
                 enemyPlanes.add(enemyPlane);
             }
             enemyPlanes.add(myPlane);
-            Item o = new Item(this);
-            items.add(o);
+            
+            
         }
 
     /**
@@ -77,52 +81,61 @@ public class PlaneWarSystem extends MyFrame{
      * */ 
     @Override
     public void paint(Graphics g) {
-        
+        //画背景
         background.draw(g);
         for(int i = 0;i<enemyPlanes.size();i++) {
             Plane plane = enemyPlanes.get(i);
             plane.draw(g);
-        }  
+        } 
+        //子弹击中
         for(int i = 0;i<bullets.size();i++) {
             Bullet bullet = bullets.get(i);
             bullet.draw(g);
             bullet.hitPlane(enemyPlanes);
             bullet.hitPlane(myPlane);
+            bullet.hitBoss(boss);
         }
-        for(int i = 0;i<explodes.size();i++) {
-            Explode e = explodes.get(i);            
-            e.draw(g);
-            
-        }
-        //for(int i =0;i<items.size();i++) {
-         //   Item item = items.get(i);
-         //   myPlane.eatItem(items);
-         //   if(myPlane.isLive()&&myPlane.getBlood()<=40) {
-        //        item.draw(g);
-         //   }
-            
-        //}
+        
+
+        //画道具
         if(items.size()>0) {
             for(int i =0;i<items.size();i++) {
                 Item item = items.get(i);
                 item.draw(g);
             }
         }
-        if(enemyPlanes.size()<=1&&myPlane.isLive()) {
+        //敌机循环
+        if(enemyPlanes.size()<=2&&myPlane.isLive()) {
             for(int i = 0;i<Constant.ENEMY_PLANE_NUM;i++) {
-                Plane enemyPlane = new Plane (90+i*120,-200,false,this);
+                Plane enemyPlane = new Plane (90+i*120,-600,false,"enemy",this);
+                enemyPlanes.add(enemyPlane);
+            }
+            for(int i = 0;i<Constant.ENEMY_PLANE_NUM;i++) {
+                Plane enemyPlane = new Plane (90+i*120,-150,false,"enemyPlane2",this);
                 enemyPlanes.add(enemyPlane);
             }
         }
-        myPlane.eatItem(items);
-        boss.draw(g);
-        g.drawString("子弹的数量："+bullets.size(), 50, 40);
-        g.drawString("敌人的数量："+enemyPlanes.size(), 50, 80);
-        g.drawString("爆炸的数量："+explodes.size(), 50, 120);
-        g.drawString("我方飞机血量："+myPlane.getBlood(), 50, 160);
-        g.drawString("道具容器大小："+items.size(), 50, 200);
-        g.drawString("Boss存活状态："+boss.isLive(), 50, 220);
-
+        //吃血
+        myPlane.eatItemAddHp(items);
+        //升级
+        myPlane.eatItemLevelUp(items);
+        //画boss
+        if(boss.getBlood()>0) {            
+            boss.draw(g);
+        }
+        //死亡爆炸
+        for(int i = 0;i<explodes.size();i++) {
+            Explode e = explodes.get(i);            
+            e.draw(g);            
+        }
+        //g.drawString("子弹的数量："+bullets.size(), 50, 20);
+        //g.drawString("敌人的数量："+enemyPlanes.size(), 50, 40);
+        //g.drawString("爆炸的数量："+explodes.size(), 50, 60);
+        //g.drawString("我方飞机血量："+myPlane.getBlood(), 50, 80);
+        //g.drawString("道具容器大小："+items.size(), 50, 100);
+        //g.drawString("我的等级："+myPlane.getLevel(), 50, 120);
+        //g.drawString("boss的血量："+boss.getBlood(), 50, 140);
+        //g.drawString("boss生存状况："+boss.isLive(), 50, 160);
     }
     
     

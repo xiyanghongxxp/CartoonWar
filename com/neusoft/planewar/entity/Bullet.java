@@ -23,6 +23,7 @@ public class Bullet extends PlaneWarObject{
     PlaneWarSystem pws;
     
     private boolean good;
+    private boolean isBig;
     
     
     static Random r = new Random();
@@ -37,7 +38,7 @@ public class Bullet extends PlaneWarObject{
         
     }
     
-    public Bullet(int x , int y ,String img,Direction dir,PlaneWarSystem pws,boolean good) {
+    public Bullet(int x , int y ,String img,Direction dir,PlaneWarSystem pws,boolean good, boolean big) {
         this.x = x;
         this.y = y;
         this.img = Images.imgs.get(img);
@@ -46,6 +47,8 @@ public class Bullet extends PlaneWarObject{
         this.live = true;
         this.pws = pws;
         this.good = good;
+        this.dir = dir;
+        this.isBig=big;
     }
     @Override
     public void draw(Graphics g) {
@@ -112,8 +115,17 @@ public class Bullet extends PlaneWarObject{
         //判断子弹打到飞机的逻辑
         if(live&&plane.isLive()&&this.getReck().intersects(plane.getReck())&&this.good!=plane.isGood()) {
             //System.out.println("打到了");
-            if(plane.isGood()) {
+            if(plane.isGood()&&this.isBig) {
                 plane.setBlood(plane.getBlood()-10);
+                this.live = false;
+                if(plane.getBlood()<=0) {
+                    plane.setLive(false);
+                    Explode e = new Explode(plane.x,plane.y,pws);
+                    this.pws.explodes.add(e);
+                    
+                }
+            }else if(plane.isGood()&&!this.isBig) {
+                plane.setBlood(plane.getBlood()-5);
                 this.live = false;
                 if(plane.getBlood()<=0) {
                     plane.setLive(false);
@@ -129,10 +141,16 @@ public class Bullet extends PlaneWarObject{
                 this.live=false;
                 plane.setLive(false);
                 //生成血块
-                if(r.nextInt(100)>90) {
-                    Item item = new Item(pws, plane.x, plane.y);
-                    pws.items.add(item);
+                if(r.nextInt(100)>30) {
+                    Item item1 = new Item(pws, plane.x, plane.y,1);
+                    pws.items.add(item1);
+                    //Item item2 = new Item(pws, plane.x, plane.y,2);
+                    //pws.items.add(item2);
                 }
+               // if(r.nextInt(100)>30) {
+                //    Item item2 = new Item(pws, plane.x, plane.y,2);
+               //     pws.items.add(item2);
+               // }
                 
                 
                 return true;
@@ -152,5 +170,47 @@ public class Bullet extends PlaneWarObject{
         }
         return false;
     }
+    
+    
+    
+    
+    
+  //子弹打Boss
+    public boolean hitBoss(Boss boss) {
+        //判断子弹打到boss的逻辑
+        if(this.live&&boss.isLive()&&this.getReck().intersects(boss.getReck())&&this.good!=boss.isGood()) {
+            
+            
+            if((!boss.isGood())&&this.isBig) {
+                
+                boss.setBlood(boss.getBlood()-30);
+                this.live = false;
+                Explode a = new Explode(boss.x,boss.y,pws);
+                this.pws.explodes.add(a);
+                if(boss.getBlood()<=0) {
+                    boss.setLive(false);
+                    
+                    Explode e = new Explode(boss.x,boss.y,pws);
+                    this.pws.explodes.add(e);
+                    
+                }
+                    
+                
+            }else if(!this.isBig) {
+                boss.setBlood(boss.getBlood()-5);
+                this.live = false;
+                Explode a = new Explode(boss.x,boss.y,pws);
+                this.pws.explodes.add(a);
+                if(boss.getBlood()<=0) {
+                    boss.setLive(false);
+                    Explode e = new Explode(boss.x,boss.y,pws);
+                    this.pws.explodes.add(e);
+                    
+                }
+                return true;
+            }          
+        }
+        return false;   
+    }    
     
 }
